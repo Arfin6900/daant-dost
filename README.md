@@ -3,11 +3,6 @@ Learn dentistry on a living 3D mouth.
 
 The AI friend that knows where it hurts — for patients, dental students, teachers and clinics.
 
-Live Demo Deployed on Vercel 3D by Blender Built at a Hackathon
-
-Live Demo · Features · How it works · Getting started · Roadmap
-
-</div>
 🦷 What is Daant Dost?
 
 Daant Dost ("tooth friend" in Urdu) is an AI-powered dental platform built around one idea: a living, interactive 3D mouth.
@@ -58,10 +53,10 @@ Add screenshots or a GIF of the app here.
 🛠 Tech stack
 Layer	Technology
 3D model	Blender (jaw and teeth model)
-Frontend	[e.g. React + Vite / Next.js]
-3D rendering	[e.g. three.js / React Three Fiber]
-Styling	[e.g. Tailwind CSS]
-AI	[e.g. model / API used]
+Frontend	[ React + Vite / Next.js]
+3D rendering	[ three.js / React Three Fiber]
+Styling	[ Tailwind CSS]
+AI	[ model / API used]
 Hosting	Vercel
 
 ✏️ Replace the bracketed items with the project's actual stack.
@@ -96,20 +91,6 @@ npm run preview
 
 ✏️ Adjust the commands and env variable names to match the project's setup.
 
-📁 Project structure
-daant-dost/
-├── public/
-│   ├── daant-dost-logo.svg     # App logo
-│   └── models/                 # 3D jaw / teeth models (.glb)
-├── src/
-│   ├── components/             # UI + 3D scene components
-│   ├── pages/                  # Patient, Student, Teacher views
-│   ├── lib/                    # AI + triage logic
-│   └── main.*                  # App entry
-├── docs/                       # Screenshots for this README
-└── README.md
-
-✏️ Update to match the real folder layout.
 
 🗺 Roadmap
  3D jaw pain marking
