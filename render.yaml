@@ -10,9 +10,9 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "22"
-      - key: ANTHROPIC_API_KEY
+      - key: DASHSCOPE_API_KEY
         sync: false
       - key: AI_MODEL
-        value: claude-opus-5-5
+        value: qwen3.7-plus
       - key: MONGO_URI
         sync: false

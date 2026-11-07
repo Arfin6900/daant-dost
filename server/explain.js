@@ -1,6 +1,7 @@
 import { z } from "zod/v4";
 import { aiEnabled, askJson } from "./ai.js";
 import { validateCommands } from "../src/shared/sceneCommands.js";
+import { LANGUAGES, languageNote } from "./i18n.js";
 
 // Narrated 3D walkthroughs of common treatments, for patients and students.
 
@@ -57,7 +58,7 @@ export const TREATMENTS = {
   },
 };
 
-export const LANGUAGES = ["English", "Urdu", "Hindi", "Arabic", "Spanish", "French", "Chinese"];
+export { LANGUAGES };
 
 const SYSTEM = `You are a kind dentist explaining a treatment to a patient with a 3D model of their mouth.
 You are given a scripted walkthrough: each step has narration and 3D commands. Rewrite ONLY the narration in the requested language, in warm, plain, reassuring words a patient understands (short sentences, no jargon, 1-2 sentences per step). Keep the same number of steps and the same meaning; do not add medical advice beyond the script.
@@ -74,7 +75,7 @@ export const explainPlan = async (treatment, language = "English") => {
       system: SYSTEM,
       effort: "low",
       schema: z.object({ title: z.string(), narration: z.array(z.string()) }),
-      prompt: `Language: ${language}\nTreatment: ${script.title}\nSteps:\n${script.steps.map((s, i) => `${i + 1}. ${s.say}`).join("\n")}`,
+      prompt: `${languageNote(language)}\nTreatment: ${script.title}\nSteps:\n${script.steps.map((s, i) => `${i + 1}. ${s.say}`).join("\n")}`,
     });
     if (out.narration.length !== script.steps.length) throw new Error("step count changed");
     return { ...base, language, title: out.title, steps: base.steps.map((s, i) => ({ ...s, say: out.narration[i] })), ai: true };

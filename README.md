@@ -9,7 +9,7 @@ Every patient is fictional. DaantDost is for education and never diagnoses anyon
 ## Run it
 
     npm install
-    cp .env.example .env      # optional: add ANTHROPIC_API_KEY for the AI
+    cp .env.example .env      # optional: add DASHSCOPE_API_KEY (Qwen) for the AI
     npm run dev               # web on http://localhost:5173, API on :3001
     npm test
 
@@ -19,7 +19,7 @@ Production (one server for the API and the built app):
 
 **No API key?** Everything still works: the patient answers from its script, written answers
 are marked by key points, and the tutor and explainer use built-in answers. Add
-`ANTHROPIC_API_KEY` to switch on Claude (`AI_MODEL`, default `claude-opus-5-5`).
+`DASHSCOPE_API_KEY` to switch on Qwen (`AI_MODEL`, default `qwen3.7-plus`).
 
 **MongoDB is optional.** Attempts are saved to `server/data/attempts.json`; set `MONGO_URI`
 to use MongoDB instead.

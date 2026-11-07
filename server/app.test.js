@@ -131,3 +131,85 @@ describe("rate limit", () => {
     expect(res.headers["retry-after"]).toBeDefined();
   });
 });
+
+describe("patient self-check API", () => {
+  test("serves the questions and a plain result with the tooth lit up", async () => {
+    const bank = await request(app).get("/api/selfcheck");
+    expect(bank.body.problems.map((p) => p.id)).toContain("toothache");
+    const res = await request(app)
+      .post("/api/selfcheck/result")
+      .send({ problem: "toothache", answers: { lasts: "Minutes or longer", night: "Yes" }, teeth: ["36", "99"] });
+    expect(res.status).toBe(200);
+    expect(res.body.teeth).toEqual([{ id: "36", plain: "big back tooth, bottom left" }]);
+    expect(res.body.commands).toContainEqual({ type: "focusTeeth", teeth: ["36"] });
+    expect(res.body.causes[0].name).toBe("An inflamed nerve inside the tooth");
+  });
+
+  test("needs a problem", async () => {
+    expect((await request(app).post("/api/selfcheck/result").send({})).status).toBe(400);
+  });
+});
+
+describe("patient history, cases and resolve", () => {
+  test("a self-check files a case that can be chatted on and resolved", async () => {
+    const pid = "patient-1";
+    await request(app).put("/api/patient/profile").send({ pid, profile: { allergies: ["Ibuprofen"], medicines: ["Metformin"], conditions: ["Diabetes"], treatments: ["Filling on 36 (2023)"] } });
+    const prof = await request(app).get("/api/patient/profile").query({ pid });
+    expect(prof.body.allergies).toEqual(["Ibuprofen"]);
+
+    const r = await request(app).post("/api/selfcheck/result").send({ patientId: pid, problem: "toothache", answers: { lasts: "Minutes or longer" }, teeth: ["36"] });
+    expect(r.body.caseId).toBeTruthy();
+    expect(r.body.selfCare.join(" ")).toMatch(/avoid ibuprofen/);
+
+    let c = await request(app).post(`/api/patient/cases/${r.body.caseId}/chat`).send({ pid, message: null });
+    expect(c.body.messages[0].remedy.id).toBe("paracetamol");
+    expect(c.body.messages[0].text).not.toMatch(/Ibuprofen for pain/);
+    c = await request(app).post(`/api/patient/cases/${r.body.caseId}/chat`).send({ pid, message: "already tried that" });
+    expect(c.body.care.tried).toEqual(["paracetamol"]);
+
+    c = await request(app).post(`/api/patient/cases/${r.body.caseId}/resolve`).send({ pid, whatHelped: "paracetamol", note: "Dentist did a filling" });
+    expect(c.body.status).toBe("resolved");
+    const list = await request(app).get("/api/patient/cases").query({ pid });
+    expect(list.body[0]).toMatchObject({ status: "resolved", resolution: { whatHelped: "Paracetamol for pain" } });
+    expect((await request(app).post(`/api/patient/cases/${r.body.caseId}/chat`).send({ pid, message: "hi" })).status).toBe(409);
+  });
+
+  test("cases are private to their patient", async () => {
+    const r = await request(app).post("/api/selfcheck/result").send({ patientId: "a", problem: "gums" });
+    expect((await request(app).get(`/api/patient/cases/${r.body.caseId}`).query({ pid: "b" })).status).toBe(404);
+  });
+});
+
+describe("interview, feedback and regeneration", () => {
+  test("without AI the interview walks the question bank, then the result reads the answers", async () => {
+    let qa = [];
+    let out = await request(app).post("/api/selfcheck/question").send({ problem: "wisdom", qa });
+    expect(out.body.question.bankId).toBe("gumflap");
+    for (let i = 0; i < 10 && !out.body.done; i += 1) {
+      const q = out.body.question;
+      qa = [...qa, { question: q.text, answer: q.bankId === "breathing" ? "No" : "Yes", type: q.type, bankId: q.bankId }];
+      out = await request(app).post("/api/selfcheck/question").send({ problem: "wisdom", qa });
+    }
+    expect(out.body.done).toBe(true);
+    const r = await request(app).post("/api/selfcheck/result").send({ patientId: "iv", problem: "wisdom", qa });
+    expect(r.body.urgency.level).toBe("today");
+    expect(r.body.redFlags).toEqual([]);
+  });
+
+  test("question text never counts as a red flag; the patient's own words do", async () => {
+    const qa = [{ question: "Is it hard to breathe or swallow?", answer: "No", type: "single", bankId: "breathing" }];
+    expect((await request(app).post("/api/selfcheck/result").send({ problem: "wisdom", qa })).body.urgency.level).not.toBe("emergency");
+    const typed = [{ question: "Anything else?", answer: "now I can't swallow properly", type: "text" }];
+    expect((await request(app).post("/api/selfcheck/result").send({ problem: "wisdom", qa: typed })).body.urgency.level).toBe("emergency");
+  });
+
+  test("feedback remakes the report and keeps the old one", async () => {
+    const r = await request(app).post("/api/selfcheck/result").send({ patientId: "fb", problem: "gums", qa: [] });
+    const c = await request(app).post(`/api/patient/cases/${r.body.caseId}/regenerate`).send({ pid: "fb", feedback: "Actually my face is swollen and it's hard to breathe" });
+    expect(c.status).toBe(200);
+    expect(c.body.versions).toHaveLength(1);
+    expect(c.body.input.feedback).toEqual(["Actually my face is swollen and it's hard to breathe"]);
+    expect(c.body.result.urgency.level).toBe("emergency");
+    expect((await request(app).post(`/api/patient/cases/${r.body.caseId}/regenerate`).send({ pid: "fb", feedback: "" })).status).toBe(400);
+  });
+});

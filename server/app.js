@@ -4,9 +4,13 @@ import { aiEnabled, MODEL } from "./ai.js";
 import { coachReport, gradeText, patientReply } from "./assessor.js";
 import { CASES, caseById } from "./cases.js";
 import { TUTOR_SUGGESTIONS, tutorPlan } from "./tutor.js";
-import { LANGUAGES, TREATMENTS, explainPlan } from "./explain.js";
+import { TREATMENTS, explainPlan } from "./explain.js";
+import { LANGUAGES } from "./i18n.js";
 import { generateCase } from "./caseAuthor.js";
 import { rateLimit } from "./rateLimit.js";
+import { publicBank, selfCheckAnswer, selfCheckResult } from "./selfcheck/selfCheck.js";
+import { extractAnswers, nextQuestion } from "./selfcheck/interview.js";
+import { patientRoutes } from "./patient/routes.js";
 import {
   MAX_HISTORY_QUESTIONS,
   answerItem,
@@ -195,6 +199,98 @@ export const createApp = ({ store, limits = {} }) => {
           layer: String(context.layer || ""),
         }),
       );
+    }),
+  );
+
+  // Interview turns from the browser: [{ question, answer, type, bankId? }].
+  const cleanQa = (list) =>
+    [].concat(list || []).slice(0, 12).map((x) => ({
+      question: String(x?.question || "").slice(0, 300),
+      answer: Array.isArray(x?.answer) ? x.answer.map((a) => String(a).slice(0, 200)).slice(0, 10) : typeof x?.answer === "number" ? x.answer : String(x?.answer ?? "").slice(0, 800),
+      type: ["single", "multi", "scale", "text"].includes(x?.type) ? x.type : "text",
+      ...(x?.bankId ? { bankId: String(x.bankId).slice(0, 40) } : {}),
+    }));
+
+  // A report regenerated from the patient's feedback; older versions are kept.
+  const regenerate = async (c, feedback) => {
+    const profile = await patients.getProfile(c.patientId);
+    c.input.feedback = [...(c.input.feedback || []), feedback].slice(-10);
+    const answers = await extractAnswers({ ...c.input, profile });
+    const result = await selfCheckResult({ ...c.input, answers, profile });
+    c.versions = [...(c.versions || []), { at: c.updatedAt || c.createdAt, result: c.result }].slice(-10);
+    c.result = { ...result, caseId: c.id };
+    c.updatedAt = new Date().toISOString();
+    return c;
+  };
+
+  const patients = patientRoutes(api, { store, wrap, HttpError, aiLimit, regenerate });
+
+  api.post(
+    "/selfcheck/question",
+    aiLimit,
+    wrap(async (req, res) => {
+      const b = req.body || {};
+      const language = LANGUAGES.includes(b.language) ? b.language : "English";
+      const patientId = String(b.patientId || "").slice(0, 64);
+      const out = await nextQuestion({
+        problem: String(b.problem || ""),
+        qa: cleanQa(b.qa),
+        story: String(b.story || "").slice(0, 1500),
+        teeth: [].concat(b.teeth || []).map(String).slice(0, 4),
+        who: b.who === "child" ? "child" : "me",
+        age: Number.isFinite(Number(b.age)) ? Number(b.age) : undefined,
+        language,
+        profile: patientId ? await patients.getProfile(patientId) : null,
+        display: language === "English" ? null : await publicBank(language),
+      });
+      if (!out) throw new HttpError(400, "Choose what kind of problem it is first.");
+      res.json(out);
+    }),
+  );
+
+  // The patient self-check: questions, then a plain-language result.
+  api.get(
+    "/selfcheck",
+    wrap(async (req, res) => {
+      const language = LANGUAGES.includes(req.query.lang) ? req.query.lang : "English";
+      res.json({ problems: await publicBank(language), languages: LANGUAGES, language });
+    }),
+  );
+
+  api.post(
+    "/selfcheck/result",
+    aiLimit,
+    wrap(async (req, res) => {
+      const b = req.body || {};
+      const patientId = String(b.patientId || "").slice(0, 64);
+      const profile = patientId ? await patients.getProfile(patientId) : null;
+      const qa = cleanQa(b.qa);
+      const input = {
+        problem: String(b.problem || ""),
+        qa,
+        feedback: [],
+        story: String(b.story || "").slice(0, 1500),
+        teeth: [].concat(b.teeth || []),
+        who: b.who === "child" ? "child" : "me",
+        age: Number.isFinite(Number(b.age)) ? Number(b.age) : undefined,
+        language: LANGUAGES.includes(b.language) ? b.language : "English",
+      };
+      const answers = b.answers && typeof b.answers === "object" ? b.answers : await extractAnswers({ ...input, profile });
+      const result = await selfCheckResult({ ...input, answers, profile });
+      if (!result) throw new HttpError(400, "Choose what kind of problem it is first.");
+      const opened = patientId ? await patients.openCase({ patientId, input, result }) : null;
+      res.json({ ...result, caseId: opened?.id || null });
+    }),
+  );
+
+  api.post(
+    "/selfcheck/ask",
+    aiLimit,
+    wrap(async (req, res) => {
+      const question = String(req.body?.question || "").trim().slice(0, 500);
+      if (!question) throw new HttpError(400, "Type your question first.");
+      const language = LANGUAGES.includes(req.body?.language) ? req.body.language : "English";
+      res.json(await selfCheckAnswer({ question, context: req.body?.context || {}, language }));
     }),
   );
 

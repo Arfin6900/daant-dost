@@ -27,12 +27,30 @@ const persistedMap = (file) => {
   return map;
 };
 
+// A named set of documents with get, save and list(filter).
+const memoryCollection = (map) => ({
+  get: async (id) => structuredClone(map.get(id) ?? null),
+  save: async (doc) => {
+    map.set(doc.id, structuredClone(doc));
+    map.flush();
+    return doc;
+  },
+  list: async (filter = () => true) => [...map.values()].filter(filter).map((d) => structuredClone(d)),
+});
+
 const memoryStore = ({ file }) => {
   const map = persistedMap(file);
+  const sibling = (name) => file && file.replace(/attempts\.json$/, `${name}.json`);
+  const collections = {};
+  const collection = (name) => {
+    collections[name] ??= memoryCollection(persistedMap(sibling(name)));
+    return collections[name];
+  };
   const cases = persistedMap(file && file.replace(/attempts\.json$/, "cases.json"));
   const flush = map.flush;
   return {
     kind: "memory",
+    collection,
     saveCase: async (card) => {
       cases.set(card.id, structuredClone(card));
       cases.flush();
@@ -69,8 +87,24 @@ const mongoStore = async (uri) => {
   const Case =
     mongoose.models.GeneratedCase ||
     mongoose.model("GeneratedCase", new mongoose.Schema({ _id: String, createdAt: String, data: Object }, { minimize: false }));
+  const models = {};
+  const collection = (name) => {
+    models[name] ??=
+      mongoose.models[`Doc_${name}`] ||
+      mongoose.model(`Doc_${name}`, new mongoose.Schema({ _id: String, owner: { type: String, index: true }, data: Object }, { minimize: false, collection: name }));
+    const M = models[name];
+    return {
+      get: async (id) => (await M.findById(id).lean())?.data ?? null,
+      save: async (doc) => {
+        await M.updateOne({ _id: doc.id }, { _id: doc.id, owner: doc.patientId || doc.id, data: doc }, { upsert: true });
+        return doc;
+      },
+      list: async (filter = () => true) => (await M.find().limit(500).lean()).map((d) => d.data).filter(filter),
+    };
+  };
   return {
     kind: "mongo",
+    collection,
     saveCase: async (card) => {
       await Case.updateOne({ _id: card.id }, { _id: card.id, createdAt: card.createdAt, data: card }, { upsert: true });
       return card;

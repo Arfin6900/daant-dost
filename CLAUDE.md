@@ -19,7 +19,7 @@ contract files need both to approve. Status tracker:
     npm run build      # production web build
     npm start          # one server: API + dist/ (run build first)
 
-`.env` (copy `.env.example`): `ANTHROPIC_API_KEY` turns on Claude; without it every AI
+`.env` (copy `.env.example`): `DASHSCOPE_API_KEY` turns on Qwen; without it every AI
 feature uses its scripted fallback. `MONGO_URI` is optional (default: `server/data/*.json`).
 
 ## Map
@@ -51,8 +51,8 @@ feature uses its scripted fallback. `MONGO_URI` is optional (default: `server/da
    deterministic version (see `assessor.js`). The demo must work with no API key.
 4. **Shared files are imported by plain Node**: imports inside `src/data` and `src/shared`
    use explicit `.js` extensions. `server/boot.test.js` fails if you forget.
-5. **Claude API:** model from `AI_MODEL` (default `claude-opus-5-5`); structured outputs
-   via `askJson`; no forced `tool_choice`; check refusals (`askJson` already does). AI
+5. **AI (Qwen on DashScope):** model from `AI_MODEL` (default `qwen3.7-plus`, with fallbacks);
+   always go through `askJson` in `server/ai.js` (JSON validated against a zod schema). AI
    routes are rate-limited in `server/app.js`; new AI routes must use `aiLimit`.
 6. **Case cards total 100 points** (history 15 + six items). `server/engine.test.js`
    checks every file in `server/cases/`. Clinical content must be accurate; flag anything
