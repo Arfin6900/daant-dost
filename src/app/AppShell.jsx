@@ -7,10 +7,10 @@ import NameDialog from "./NameDialog";
 import { useStudent } from "../lib/student";
 
 export const NAV = [
-  { to: "/assess", label: "AI assessment" },
-  { to: "/explore", label: "Explore" },
-  { to: "/learn", label: "Learn" },
-  { to: "/explain", label: "Explain" },
+  { to: "/assess", label: "Practice cases" },
+  { to: "/explore", label: "3D explorer" },
+  { to: "/learn", label: "Drills" },
+  { to: "/explain", label: "Treatments explained" },
 ];
 
 const navClass = ({ isActive }) =>
