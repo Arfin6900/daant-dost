@@ -114,7 +114,9 @@ export const careTurn = async (c, profile, message) => {
   apply();
 
   const helped = intent === "helped";
-  const remedy = helped ? null : nextRemedy(c.problem, profile, c.care, age);
+  // A plain question keeps the current remedy; anything else moves on.
+  const keep = (intent === "question" || intent === "worse") && last && !c.care.rejected.includes(last.id);
+  const remedy = helped ? null : keep ? last : nextRemedy(c.problem, profile, c.care, age);
   if (remedy) c.care.offered = [...new Set([...c.care.offered, remedy.id])];
   c.care.current = helped ? c.care.current : remedy?.id || null;
   const urgency = URGENCY[c.result?.urgency?.level] || URGENCY.soon;
@@ -134,7 +136,7 @@ Already tried: ${c.care.tried.map((id) => remedyById(id)?.title).join(", ") || "
 Recent chat:
 ${c.messages.slice(-6).map((m) => `${m.role === "patient" ? "Patient" : "You"}: ${m.text}`).join("\n") || "(none yet)"}
 ${flags.length ? `WARNING SIGNS in their message: ${flags.join(", ")}. Tell them to get emergency help now.` : ""}
-${helped ? "They say it helped: be glad, tell them to still see the dentist to treat the cause, and suggest pressing 'My problem is solved' when it's fully better." : `REMEDY TO OFFER: ${remedy ? `${remedy.title}: ${remedy.steps.join(" ")}` : "none left"}`}`,
+${intent === "question" ? "They asked a question: answer it first, plainly. Then briefly remind them of the current remedy below. " : ""}${helped ? "They say it helped: be glad, tell them to still see the dentist to treat the cause, and suggest pressing 'My problem is solved' when it's fully better." : `REMEDY TO OFFER: ${remedy ? `${remedy.title}: ${remedy.steps.join(" ")}` : "none left"}`}`,
       });
       reply = out.reply;
       ai = true;
@@ -147,7 +149,9 @@ ${helped ? "They say it helped: be glad, tell them to still see the dentist to t
       ? `${URGENCY.emergency.action}\n\n${offerText(remedy)}`
       : helped
         ? "I'm glad that helped. Please still see a dentist to treat the cause. When you feel fully better, press “My problem is solved” to save what worked."
-        : `${intent === "allergic" ? "Thanks for telling me, I won't suggest that again. " : intent === "tried" ? "Thanks, let's try something else. " : ""}${offerText(remedy)}`;
+        : intent === "question"
+          ? `That's a good question for your dentist. Meanwhile, keep going with: ${remedy ? remedy.title : "seeing a dentist soon"}.`
+          : `${intent === "allergic" ? "Thanks for telling me, I won't suggest that again. " : intent === "tried" ? "Thanks, let's try something else. " : ""}${offerText(remedy)}`;
   }
 
   say(c, "assistant", reply, { remedy: remedy ? { id: remedy.id, title: remedy.title, steps: remedy.steps } : null, intent, urgent: flags.length > 0, ai });

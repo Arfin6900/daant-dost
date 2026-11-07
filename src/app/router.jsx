@@ -8,6 +8,8 @@ import LearnPage from "../features/learn/LearnPage";
 import QuizPage from "../features/learn/QuizPage";
 import ExplainPage from "../features/explain/ExplainPage";
 import CheckPage from "../features/check/CheckPage";
+import HistoryPage from "../features/history/HistoryPage";
+import CasePage from "../features/history/CasePage";
 import NotFound from "./NotFound";
 
 export const routes = [
@@ -17,6 +19,8 @@ export const routes = [
     children: [
       { index: true, element: <HomePage /> },
       { path: "check", element: <CheckPage /> },
+      { path: "history", element: <HistoryPage /> },
+      { path: "history/:id", element: <CasePage /> },
       { path: "explore", element: <ExplorePage /> },
       { path: "assess", element: <AssessHub /> },
       { path: "assess/:id", element: <AssessmentPage /> },

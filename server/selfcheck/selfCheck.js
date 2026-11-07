@@ -9,6 +9,7 @@ import { validateCommands } from "../../src/shared/sceneCommands.js";
 import { plainTooth } from "../../src/shared/plainTooth.js";
 import { PROBLEM_BY_ID, PROBLEMS, URGENCY } from "./bank.js";
 import { triage } from "./triage.js";
+import { interviewText, ownWords } from "./interview.js";
 import { REMEDIES, unsafeBecause } from "../patient/remedies.js";
 import { describeProfile } from "../patient/care.js";
 
@@ -161,10 +162,10 @@ const painAdvice = (profile, age) => {
   return "Because of your allergies or health conditions, ask a pharmacist which painkiller is safe for you before taking anything.";
 };
 
-export const selfCheckResult = async ({ problem: problemId, answers = {}, story = "", teeth = [], who = "me", age, language = "English", profile = null }) => {
+export const selfCheckResult = async ({ problem: problemId, answers = {}, story = "", teeth = [], who = "me", age, language = "English", profile = null, qa = [], feedback = [] }) => {
   const problem = PROBLEM_BY_ID[problemId];
   if (!problem) return null;
-  const base = triage(problemId, answers, story);
+  const base = triage(problemId, answers, ownWords({ story, qa, feedback }));
   const swap = painAdvice(profile, who === "child" ? age : undefined);
   if (swap) base.selfCare = base.selfCare.map((s) => (/paracetamol or ibuprofen/.test(s) ? swap : s));
   const validTeeth = [].concat(teeth).map(String).filter((id) => toothById(id)).slice(0, 4);
@@ -204,6 +205,8 @@ Where: ${validTeeth.map(plainTooth).join("; ") || "not marked"}
 In their own words: ${story || "(nothing extra)"}
 Their answers:
 ${describeAnswers(problem, answers)}
+${qa.length ? `\nThe interview:\n${interviewText(qa)}` : ""}
+${feedback.length ? `\nCorrections they gave after an earlier report (these override earlier answers; acknowledge them in the summary):\n${feedback.map((f) => `- ${f}`).join("\n")}` : ""}
 
 SAFETY RESULT (do not change): urgency "${base.urgency.title}"${base.redFlags.length ? `; warning signs: ${base.redFlags.join(", ")}` : ""}.
 Possible causes, in order:

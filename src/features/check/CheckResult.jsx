@@ -4,6 +4,7 @@ import { FiAlertOctagon, FiAlertTriangle, FiCalendar, FiCheckCircle, FiClock, Fi
 import { api } from "../../lib/api";
 import Reveal from "../assess/Reveal";
 import { stringsFor } from "./strings";
+import CarePanel from "../history/CarePanel";
 
 const LEVEL = {
   emergency: { icon: FiAlertOctagon, box: "bg-[#C21E3A] text-white", sub: "text-white/90" },
@@ -81,7 +82,7 @@ const FollowUp = ({ result, language }) => {
   );
 };
 
-const CheckResult = ({ result, language, onRestart }) => {
+const CheckResult = ({ result, language, onRestart, followUp = false }) => {
   const t = stringsFor(language);
   const L = LEVEL[result.urgency.level];
   const [copied, setCopied] = useState(false);
@@ -215,15 +216,13 @@ const CheckResult = ({ result, language, onRestart }) => {
         </Card>
       )}
 
-      <FollowUp result={result} language={language} />
+      {result.caseId ? <CarePanel caseId={result.caseId} language={language} /> : followUp ? <FollowUp result={result} language={language} /> : null}
 
       <div className="flex flex-wrap gap-3 print:hidden">
-        <button type="button" className="btn-primary" onClick={onRestart}>
+        <button type="button" className="btn-quiet" onClick={onRestart}>
           <FiRefreshCw /> {t.restart}
         </button>
-        <button type="button" className="btn-quiet" onClick={() => window.print()}>
-          <FiPrinter /> {t.print}
-        </button>
+
       </div>
       {result.ai && <p className="text-xs text-ink-faint">{t.aiNote}</p>}
     </div>
