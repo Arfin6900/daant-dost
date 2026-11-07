@@ -1,0 +1,526 @@
+[
+ {
+  "id": "toothache",
+  "label": "Daant ka dard",
+  "hint": "Daant mein dard ho raha hai",
+  "questions": [
+   {
+    "id": "trigger",
+    "text": "Dard kis baat se shuru hota hai?",
+    "options": [
+     "Thandi cheezein ya drinks",
+     "Garam cheezein ya drinks",
+     "Meethi cheezein",
+     "Chabane ya katne par",
+     "Khud ba khud aata hai",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "lasts",
+    "text": "Shuru hone ke baad dard kitni der rehta hai?",
+    "options": [
+     "Kuch seconds, phir khatam",
+     "Kuch minutes ya us se zyada",
+     "Har waqt rehta hai",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "night",
+    "text": "Kya ye raat ko neend se jagata hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "swelling",
+    "text": "Koi sujan (swelling) hai?",
+    "options": [
+     "Koi sujan nahi",
+     "Masooray (gum) par chota sa ubhaar",
+     "Chehra ya gaal sooj gaya hai",
+     "Sujan aankh, gardan ya jaw ki taraf badh rahi hai"
+    ],
+    "labels": []
+   },
+   {
+    "id": "severity",
+    "text": "Abhi dard kitna tez hai?",
+    "options": [],
+    "labels": [
+     "Koi dard nahi",
+     "Zindagi ka sab se zyada dard"
+    ]
+   },
+   {
+    "id": "fever",
+    "text": "Kya bukhaar hai ya aap ko general bura mehsoos ho raha hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   }
+  ]
+ },
+ {
+  "id": "swelling",
+  "label": "Sujan (Swelling)",
+  "hint": "Masooray, chehre ya jaw mein sujan",
+  "questions": [
+   {
+    "id": "where",
+    "text": "Sujan kahan hai?",
+    "options": [
+     "Kisi daant ke paas masooray (gum) par",
+     "Gaalon ya chehre par",
+     "Jaw ke neeche ya gardan mein",
+     "Aankh ke qareeb"
+    ],
+    "labels": []
+   },
+   {
+    "id": "spreading",
+    "text": "Kya ye barh rahi hai ya phail rahi hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "breathing",
+    "text": "Saans lene ya nigalne (swallow) mein mushkil hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "fever",
+    "text": "Kya bukhaar hai ya aap ko general bura mehsoos ho raha hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "toothpain",
+    "text": "Kya sujan ke qareeb wala daant dukhta hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "wisdom",
+    "text": "Kya ye bilkul peeche hai, wisdom tooth ke aas paas?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   }
+  ]
+ },
+ {
+  "id": "gums",
+  "label": "Masooray se khoon ya dard",
+  "hint": "Masooray se khoon aa raha hai, laal hain ya dukhte hain",
+  "questions": [
+   {
+    "id": "when",
+    "text": "Masooray se kab khoon aata hai?",
+    "options": [
+     "Sirf brush ya floss karte waqt",
+     "Kabhi kabhi khud ba khud",
+     "Khoon nahi aata, bas dard hota hai",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "howlong",
+    "text": "Ye masla kitne arsay se hai?",
+    "options": [
+     "2 haftay se kam",
+     "Kuch haftay se mahino tak",
+     "Us se bhi zyada"
+    ],
+    "labels": []
+   },
+   {
+    "id": "loose",
+    "text": "Kya koi daant hilta mehsoos hota hai ya lagta hai ke wo move kar raha hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "lump",
+    "text": "Kya masooray par koi dardnak ubhaar (lump) hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "factors",
+    "text": "Kya in mein se koi baat aap par lagu hoti hai?",
+    "options": [
+     "Main smoking karta/karti hoon",
+     "Mujhe diabetes hai",
+     "Main pregnant hoon",
+     "Main blood thinners le raha/rahi hoon",
+     "In mein se koi nahi"
+    ],
+    "labels": []
+   }
+  ]
+ },
+ {
+  "id": "broken",
+  "label": "Toota ya chipped daant",
+  "hint": "Daant ka tukra toot gaya hai ya teez mehsoos hota hai",
+  "questions": [
+   {
+    "id": "size",
+    "text": "Kitna hissa toota hai?",
+    "options": [
+     "Bilkul chota chip",
+     "Kaafi bada tukra",
+     "Daant ka aksar hissa",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "pain",
+    "text": "Kya dard ho raha hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "pink",
+    "text": "Kya toote hue hissay mein koi pink ya laal nishan nazar aa raha hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "injury",
+    "text": "Kya ye girne, accident ya chehre par lagne se hua?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "bite",
+    "text": "Kya jab aap mun band karte hain to daant pehle jaise milte hain?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   }
+  ]
+ },
+ {
+  "id": "knocked_out",
+  "label": "Daant nikal gaya",
+  "hint": "Poora daant nikal gaya hai",
+  "questions": [
+   {
+    "id": "whose",
+    "text": "Ye kiska daant hai?",
+    "options": [
+     "Bade ka permanent daant (7 saal se zyada umar)",
+     "Bachay ka doodh ka daant",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "when",
+    "text": "Ye kitni der pehle nikla?",
+    "options": [
+     "1 ghante se kam",
+     "1 ghante se zyada"
+    ],
+    "labels": []
+   },
+   {
+    "id": "havetooth",
+    "text": "Kya wo daant aap ke paas hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "headinjury",
+    "text": "Kya sar par laga tha, sar dard, ulti ya confusion hua?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   }
+  ]
+ },
+ {
+  "id": "wisdom",
+  "label": "Wisdom tooth ka dard",
+  "hint": "Mun ke bilkul peeche dard",
+  "questions": [
+   {
+    "id": "gumflap",
+    "text": "Kya peeche wale daant ke upar ya peeche masoora (gum) sooj gaya hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "taste",
+    "text": "Kya mun mein koi bura zaiqa (taste) ya boo aa rahi hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "opening",
+    "text": "Kya mun ko poora kholne mein mushkil ho rahi hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "breathing",
+    "text": "Nigalne (swallow) ya saans lene mein mushkil hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "fever",
+    "text": "Kya bukhaar hai ya aap ko general bura mehsoos ho raha hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   }
+  ]
+ },
+ {
+  "id": "ulcer",
+  "label": "Mun ka chala ya ulcer",
+  "hint": "Mun ke andar chala, dhabba ya ubhaar",
+  "questions": [
+   {
+    "id": "howlong",
+    "text": "Ye kitne din se hai?",
+    "options": [
+     "1 hafte se kam",
+     "1 se 3 haftay",
+     "3 haftay se zyada"
+    ],
+    "labels": []
+   },
+   {
+    "id": "painful",
+    "text": "Kya ye dardnak hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "recurring",
+    "text": "Kya aap ko aisay chale aksar hote rehte hain?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "patch",
+    "text": "Kya ye chalay ki bajaye koi safed ya laal dhabba ya ubhaar hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "cause",
+    "text": "Kya kisi wajah se hua ho sakta hai, jaise teez daant, braces ya cheek kat jane se?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   }
+  ]
+ },
+ {
+  "id": "jaw",
+  "label": "Jaw ka dard ya awaaz",
+  "hint": "Jaw dukhta hai, click karta hai ya jam jata hai",
+  "questions": [
+   {
+    "id": "symptoms",
+    "text": "Aap ko kya mehsoos hota hai?",
+    "options": [
+     "Clicking ya popping awaaz",
+     "Kaan ke samne dard",
+     "Chabane par dard",
+     "Sar dard (Headaches)",
+     "Mun poora kholne mein mushkil",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "locked",
+    "text": "Kya abhi aap ka jaw khula ya band phansa hua hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "grind",
+    "text": "Kya aap daant peeste hain ya subah uthte waqt jaw dukhta hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "injury",
+    "text": "Kya ye chehre par lagne ke baad shuru hua?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   }
+  ]
+ },
+ {
+  "id": "after_treatment",
+  "label": "Daant nikalne ke baad dard",
+  "hint": "Extraction ke baad koi masla",
+  "questions": [
+   {
+    "id": "days",
+    "text": "Daant kitne din pehle nikala gaya tha?",
+    "options": [
+     "Aaj ya kal",
+     "2 se 4 din pehle",
+     "4 din se zyada pehle"
+    ],
+    "labels": []
+   },
+   {
+    "id": "pain",
+    "text": "Dard mein kya tabdeeli aayi hai?",
+    "options": [
+     "Har din behtar ho raha hai",
+     "Behtar hone ke baad phir kharab ho gaya",
+     "Shuru se hi bohot tez aur constant hai"
+    ],
+    "labels": []
+   },
+   {
+    "id": "bleeding",
+    "text": "Kya saaf kapray ya pad par 20 minute dabane ke baad bhi khoon aa raha hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "swelling",
+    "text": "Kya chehre ki sujan barh rahi hai ya bukhaar hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   },
+   {
+    "id": "smoke",
+    "text": "Kya us ke baad aap ne smoking ki hai ya mun ko zor se dhoya (rinse) hai?",
+    "options": [
+     "Haan",
+     "Nahi",
+     "Pata nahi"
+    ],
+    "labels": []
+   }
+  ]
+ }
+]
