@@ -2,6 +2,7 @@
 ### You can view the DEMO:          https://drive.google.com/drive/folders/1fYVfT2w2Djn6ck3TvvbnjTZizkzzNR_y?usp=sharing        ###
 
 Deployment Link: https://daant-dost.vercel.app/
+The updated code was pushed on Develop Branch and not on MAIN - please refer to develop branch code which was submitted on the hackathon submission form : https://github.com/Arfin6900/daant-dost/tree/develop (we have not updated the code after submission)
 Daant Dost
 Learn dentistry on a living 3D mouth.
 
