@@ -44,6 +44,7 @@ const AssessHub = () => {
   useEffect(() => {
     api("/cases").then(setCases, (e) => setError(e.message));
     api("/health").then((h) => setAiOn(h.ai), () => {});
+    if (window.location.hash === "#create") setCreating(true);
     api(`/assessments?studentId=${encodeURIComponent(getStudent().id)}`).then(setPast, () => {});
   }, []);
 
