@@ -8,6 +8,7 @@ import { useStudent } from "../lib/student";
 
 export const NAV = [
   { to: "/check", label: "Check my teeth" },
+  { to: "/history", label: "My dental history" },
   { to: "/explain", label: "Treatments explained" },
   { to: "/explore", label: "3D mouth" },
   { to: "/assess", label: "For students" },

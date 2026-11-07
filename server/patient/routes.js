@@ -5,7 +5,7 @@ import { careTurn, caseSummary, cleanProfile, emptyProfile, newCase, resolveCase
 
 const pidOf = (v) => String(v || "").slice(0, 64);
 
-export const patientRoutes = (api, { store, wrap, HttpError, aiLimit }) => {
+export const patientRoutes = (api, { store, wrap, HttpError, aiLimit, regenerate }) => {
   const profiles = store.collection("profiles");
   const cases = store.collection("patient-cases");
 
@@ -66,6 +66,19 @@ export const patientRoutes = (api, { store, wrap, HttpError, aiLimit }) => {
       await careTurn(c, profile, message);
       await cases.save(c);
       if (profile.allergies.length !== before) await profiles.save({ ...profile, updatedAt: new Date().toISOString() });
+      res.json(c);
+    }),
+  );
+
+  api.post(
+    "/patient/cases/:id/regenerate",
+    aiLimit,
+    wrap(async (req, res) => {
+      const c = await ownCase(req.params.id, pidOf(req.body?.pid));
+      const feedback = String(req.body?.feedback || "").trim().slice(0, 800);
+      if (!feedback) throw new HttpError(400, "Tell us what to change first.");
+      await regenerate(c, feedback);
+      await cases.save(c);
       res.json(c);
     }),
   );

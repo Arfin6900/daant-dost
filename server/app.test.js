@@ -179,3 +179,37 @@ describe("patient history, cases and resolve", () => {
     expect((await request(app).get(`/api/patient/cases/${r.body.caseId}`).query({ pid: "b" })).status).toBe(404);
   });
 });
+
+describe("interview, feedback and regeneration", () => {
+  test("without AI the interview walks the question bank, then the result reads the answers", async () => {
+    let qa = [];
+    let out = await request(app).post("/api/selfcheck/question").send({ problem: "wisdom", qa });
+    expect(out.body.question.bankId).toBe("gumflap");
+    for (let i = 0; i < 10 && !out.body.done; i += 1) {
+      const q = out.body.question;
+      qa = [...qa, { question: q.text, answer: q.bankId === "breathing" ? "No" : "Yes", type: q.type, bankId: q.bankId }];
+      out = await request(app).post("/api/selfcheck/question").send({ problem: "wisdom", qa });
+    }
+    expect(out.body.done).toBe(true);
+    const r = await request(app).post("/api/selfcheck/result").send({ patientId: "iv", problem: "wisdom", qa });
+    expect(r.body.urgency.level).toBe("today");
+    expect(r.body.redFlags).toEqual([]);
+  });
+
+  test("question text never counts as a red flag; the patient's own words do", async () => {
+    const qa = [{ question: "Is it hard to breathe or swallow?", answer: "No", type: "single", bankId: "breathing" }];
+    expect((await request(app).post("/api/selfcheck/result").send({ problem: "wisdom", qa })).body.urgency.level).not.toBe("emergency");
+    const typed = [{ question: "Anything else?", answer: "now I can't swallow properly", type: "text" }];
+    expect((await request(app).post("/api/selfcheck/result").send({ problem: "wisdom", qa: typed })).body.urgency.level).toBe("emergency");
+  });
+
+  test("feedback remakes the report and keeps the old one", async () => {
+    const r = await request(app).post("/api/selfcheck/result").send({ patientId: "fb", problem: "gums", qa: [] });
+    const c = await request(app).post(`/api/patient/cases/${r.body.caseId}/regenerate`).send({ pid: "fb", feedback: "Actually my face is swollen and it's hard to breathe" });
+    expect(c.status).toBe(200);
+    expect(c.body.versions).toHaveLength(1);
+    expect(c.body.input.feedback).toEqual(["Actually my face is swollen and it's hard to breathe"]);
+    expect(c.body.result.urgency.level).toBe("emergency");
+    expect((await request(app).post(`/api/patient/cases/${r.body.caseId}/regenerate`).send({ pid: "fb", feedback: "" })).status).toBe(400);
+  });
+});

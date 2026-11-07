@@ -46,9 +46,23 @@ const Nav = ({ onBack, onNext, nextLabel, disabled, t }) => (
 );
 
 const Question = ({ q, value, onChange, t }) => {
-  const shown = (i) => q.display?.options?.[i] || q.options[i];
+  const shown = (i) => q.shownOptions?.[i] || q.display?.options?.[i] || q.options[i];
+  if (q.type === "text") {
+    return (
+      <textarea
+        rows={3}
+        value={value ?? ""}
+        onChange={(e) => onChange(e.target.value)}
+        maxLength={800}
+        autoFocus
+        className="field resize-y text-lg"
+        aria-label={q.text}
+      />
+    );
+  }
   if (q.type === "scale") {
     const v = value ?? 5;
+    q = { min: 0, max: 10, labels: ["No pain", "Worst pain ever"], ...q };
     return (
       <div>
         <div className="flex items-end justify-between">
@@ -108,10 +122,13 @@ const Question = ({ q, value, onChange, t }) => {
 
 // The self-check, one simple step at a time. `teeth` and `onTeeth` are shared
 // with the 3D mouth so tapping a tooth there marks where it hurts.
-const CheckWizard = ({ bank, languages, state, setState, teeth, onTeeth, onSubmit, onWho, translating }) => {
+const CheckWizard = ({ bank, languages, state, setState, teeth, onTeeth, onWho, translating, interview, onStartInterview, onAnswer, onBackQuestion }) => {
   const t = stringsFor(state.language);
-  const [step, setStep] = useState("who");
-  const [qi, setQi] = useState(0);
+  const step = state.step || "who";
+  const setStep = (s) => setState((x) => ({ ...x, step: s }));
+  const [value, setValue] = useState(undefined);
+  const qi = interview.qa.length;
+  useEffect(() => setValue(interview.question?.type === "scale" ? 5 : undefined), [interview.question]);
   const problem = bank.find((p) => p.id === state.problem);
   const areas = state.who === "child" && Number(state.age) < 12 ? CHILD_AREAS : MOUTH_AREAS;
 
@@ -119,7 +136,7 @@ const CheckWizard = ({ bank, languages, state, setState, teeth, onTeeth, onSubmi
 
   const set = (patch) => setState((s) => ({ ...s, ...patch }));
   const answer = (id, v) => setState((s) => ({ ...s, answers: { ...s.answers, [id]: v } }));
-  const total = 4 + (problem?.questions.length || 5);
+  const total = 4 + Math.max(6, qi + 1);
   const done = { who: 0, where: 1, what: 2, story: 3, q: 4 + qi }[step];
   // Wisdom-tooth pain only makes sense when no teeth, or a wisdom tooth, are marked.
   const isWisdom = (id) => toothById(id)?.dentition === "permanent" && toothById(id)?.position === 8;
@@ -205,7 +222,6 @@ const CheckWizard = ({ bank, languages, state, setState, teeth, onTeeth, onSubmi
                   aria-pressed={on}
                   onClick={() => {
                     set({ problem: p.id, answers: {} });
-                    setQi(0);
                   }}
                   className={`relative flex items-start gap-3 rounded-2xl border-2 p-4 text-left transition-colors ${
                     on ? "border-brand bg-brand-tint" : "border-line bg-white hover:bg-bone"
@@ -274,25 +290,39 @@ const CheckWizard = ({ bank, languages, state, setState, teeth, onTeeth, onSubmi
             placeholder={t.storyPlaceholder}
             className="field resize-y text-lg"
           />
-          <Nav t={t} onBack={() => setStep("what")} onNext={() => setStep("q")} nextLabel={state.story.trim() ? t.next : t.skip} />
+          <Nav
+            t={t}
+            onBack={() => setStep("what")}
+            onNext={() => {
+              setStep("q");
+              onStartInterview();
+            }}
+            nextLabel={state.story.trim() ? t.next : t.skip}
+          />
         </Step>
       )}
 
       {step === "q" && problem && (
-        <Step key={problem.questions[qi].id} eyebrow={t.question(qi + 1, problem.questions.length)} title={problem.questions[qi].display?.text || problem.questions[qi].text}>
-          <Question t={t} q={problem.questions[qi]} value={state.answers[problem.questions[qi].id]} onChange={(v) => answer(problem.questions[qi].id, v)} />
-          <Nav
-            t={t}
-            onBack={() => (qi === 0 ? setStep("story") : setQi(qi - 1))}
-            onNext={() => {
-              const q = problem.questions[qi];
-              if (q.type === "scale" && state.answers[q.id] === undefined) answer(q.id, 5);
-              if (qi + 1 < problem.questions.length) setQi(qi + 1);
-              else onSubmit();
-            }}
-            nextLabel={qi + 1 < problem.questions.length ? (state.answers[problem.questions[qi].id] === undefined && problem.questions[qi].type !== "scale" ? t.skip : t.next) : t.results}
-          />
-        </Step>
+        <div>
+          {interview.loading && (
+            <div className="flex animate-rise-in items-center gap-3 py-10 text-ink-soft" aria-live="polite">
+              <span className="h-6 w-6 animate-orbit rounded-full border-2 border-line border-t-brand" />
+              <span className="font-bold">{qi ? t.nextQuestion : t.firstQuestion}</span>
+            </div>
+          )}
+          {interview.error && <p role="alert" className="rounded-xl bg-score-low-tint px-4 py-3 font-bold text-score-low">{interview.error}</p>}
+          {!interview.loading && interview.question && (
+            <Step key={`${qi}-${interview.question.text}`} eyebrow={t.question(qi + 1, Math.max(qi + 1, 6))} title={interview.question.text} help={interview.question.why}>
+              <Question t={t} q={interview.question} value={value} onChange={setValue} />
+              <Nav
+                t={t}
+                onBack={() => (qi === 0 ? setStep("story") : onBackQuestion())}
+                onNext={() => onAnswer(value === undefined || value === "" ? (interview.question.type === "multi" ? [] : t.dontKnow) : value)}
+                nextLabel={value === undefined || value === "" || (Array.isArray(value) && !value.length) ? t.skip : t.next}
+              />
+            </Step>
+          )}
+        </div>
       )}
     </div>
   );
