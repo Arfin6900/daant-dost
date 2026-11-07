@@ -1,3 +1,6 @@
+
+### You can view the DEMO:          https://drive.google.com/drive/folders/1fYVfT2w2Djn6ck3TvvbnjTZizkzzNR_y?usp=sharing        ###
+
 Daant Dost
 Learn dentistry on a living 3D mouth.
 
@@ -44,7 +47,7 @@ Aftercare follow-ups in the patient's language
  │              │    │               │    │  urgency     │    │                  │
  └──────────────┘    └───────────────┘    └──────────────┘    └──────────────────┘
                                          red flags checked first
-📸 Screenshots
+
 
 Add screenshots or a GIF of the app here.
 
