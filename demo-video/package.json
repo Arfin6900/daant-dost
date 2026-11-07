@@ -1,0 +1,15 @@
+{
+  "name": "toothtwin-demo-video",
+  "private": true,
+  "type": "module",
+  "description": "Scripted, narrated 1080p demo video of ToothTwin (Kokoro voice)",
+  "scripts": {
+    "record": "node record.mjs",
+    "rehearse": "REHEARSE=1 node record.mjs"
+  },
+  "dependencies": {
+    "ffmpeg-static": "^5.3.0",
+    "kokoro-js": "^1.2.1",
+    "playwright": "^1.65.0"
+  }
+}
